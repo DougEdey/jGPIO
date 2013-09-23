@@ -5,9 +5,11 @@ This is an entry level GPIO library for Java. I'll be adding onto it rapidly as 
 
 The Device Tree Overlay is a new introduction in Linux Kernel 3.8 to enforce easier kernel devlopment.
 
+One Parameter is required: -Dgpio_definition=<path to definition file>, this needs topoint at a definition JSON file, see bone.js for an example
+
 Use jGPIO.DTOTest by itself to list the Free GPIO pins
 
-java -cp libs/json-simple-1.1.1.jar:. jGPIO.DTOTest
+java -cp libs/json-simple-1.1.1.jar:. -Dgpio_definition=jGPIO/bone.js jGPIO.DTOTest
 
 Then you can supply a direct GPIO pin (GPIO2_7 for instance) or a Pin Header P9_41 to generate a DTO file if the pin is free. If the pin isn't free it'll tell you
 
