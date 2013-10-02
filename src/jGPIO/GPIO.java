@@ -1,6 +1,7 @@
 package jGPIO;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -18,7 +19,10 @@ import org.json.simple.JSONObject;
 public class GPIO {
 
 	static String baseOffset = "44e10800";
-	
+	static int DIGITAL = 0;
+	static int ANALOGUE = 1;
+	FilePaths gpioFiles = null;
+	int pinNumber = -1;
 	
 	/* These are dupes from DTO */
 	public enum Direction {
@@ -47,6 +51,7 @@ public class GPIO {
 	/* Beaglebone Regex */
 	public static Pattern pinPatternBeagle = Pattern.compile("(p))([0-9])_([0-9]*)", Pattern.CASE_INSENSITIVE);
 	
+	boolean closing = false;
 	/**
 	 * @param args
 	 */
@@ -100,12 +105,12 @@ public class GPIO {
 	
 	
 	public GPIO(String name, Direction direction) throws InvalidGPIOException, RuntimeException {
-		int pinNumber = getPinNumber(name);
+		pinNumber = getPinNumber(name);
 		
 		// we have the pin to set the direction on 
 		writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
 		writeFile(FilePaths.getDirectionPath(pinNumber), direction.value);
-		
+		gpioFiles = new FilePaths(pinNumber);
 	}
 	
 	public static int getPinNumber(String pinName) throws InvalidGPIOException{
@@ -145,5 +150,35 @@ public class GPIO {
 			throw new RuntimeException("Could not write to GPIO file: " + e.getMessage());
 		}
 	}
+	
+	protected String readFile(String filename) throws FileNotFoundException, RuntimeException, IOException {
+		BufferedReader fis = null;
+		try {
+			fis = new BufferedReader(new FileReader(filename));
+			if(fis.ready()) {
+				
+				return fis.readLine();
+			}
+		} finally {
+			if(fis != null) {
+				fis.close();
+			}
+		}
+		return null;
+	}
+	
+	public void close() {
+		closing = true;
+		writeFile(FilePaths.getUnexportPath(), Integer.toString(pinNumber));
+	}
+
+	public String readValue() throws FileNotFoundException, RuntimeException, IOException  {
+		return readFile(FilePaths.getValuePath(pinNumber));
+	}
+	
+	public void writeValue(String incoming) {
+		writeFile(FilePaths.getValuePath(pinNumber), incoming);
+	}
+	
 
 }

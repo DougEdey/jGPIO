@@ -11,6 +11,12 @@ public class FilePaths {
 	static String VALUE_PATH = DEVICE_PATH + "/value";
 	static String ACTIVELOW_PATH = DEVICE_PATH + "/active_low";
 	
+	int pinNo = -1;
+	
+	public FilePaths(int pinNumber) {
+		pinNo = pinNumber;
+	}
+
 	static String getExportPath() {
 		
 		if(System.getProperty("debugGPIO") == null) {
