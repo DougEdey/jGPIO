@@ -12,10 +12,18 @@ public class OutPin extends GPIO {
 	int pinMode = -1;
 	GPIO gpioPin = null;
 	
-	public OutPin(String pin, int mode) throws InvalidGPIOException, RuntimeException {
+	public OutPin(String pin) throws InvalidGPIOException, RuntimeException {
 		/* We need to determine if we are digital or analogue, for now, we'll use it for setup and be happy */
 		super(pin, GPIO.Direction.OUTPUT);
 		
+	}
+	
+	public void setValue(boolean target) {
+		if(target) {
+			setValue("1");
+		} else {
+			setValue("0");
+		}
 	}
 	
 	public void setValue(String target) {
