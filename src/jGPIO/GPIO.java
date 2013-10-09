@@ -49,7 +49,7 @@ public class GPIO {
 	public static Pattern pinPatternAlt = Pattern.compile("(gpio)([0-9]*)",Pattern.CASE_INSENSITIVE);
 	
 	/* Beaglebone Regex */
-	public static Pattern pinPatternBeagle = Pattern.compile("(p))([0-9])_([0-9]*)", Pattern.CASE_INSENSITIVE);
+	public static Pattern pinPatternBeagle = Pattern.compile("(p)([0-9])_([0-9]*)", Pattern.CASE_INSENSITIVE);
 	
 	boolean closing = false;
 	/**
