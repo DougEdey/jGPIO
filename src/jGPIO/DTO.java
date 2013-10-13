@@ -200,6 +200,11 @@ public class DTO {
 	}
 	
 	public static JSONObject findDetails(String gpio_name) {
+		// Do we have a valid definition file, or should we just direct map?
+		if (pinDefinitions == null) {
+			System.out.println("No definitions file found, assuming direct mapping");
+			return null; 
+		}
 		for (Object obj: pinDefinitions) {
 			JSONObject jObj = (JSONObject) obj;
 			String key = (String) jObj.get("key");
