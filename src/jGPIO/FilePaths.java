@@ -19,7 +19,7 @@ public class FilePaths {
 
 	static String getExportPath() {
 		
-		if(System.getProperty("debugGPIO") == null) {
+		if(System.getProperty("debugGPIO") != null) {
 			return MOCK + EXPORT_PATH;
 		}
 		
@@ -27,7 +27,7 @@ public class FilePaths {
 	}
 	
 	static String getUnexportPath() {
-		if(System.getProperty("debugGPIO") == null) {
+		if(System.getProperty("debugGPIO") != null) {
 			return MOCK + UNEXPORT_PATH;
 		}
 		
@@ -35,7 +35,7 @@ public class FilePaths {
 	}
 
 	public static String getDirectionPath(int pinNumber) {
-		if(System.getProperty("debugGPIO") == null) {
+		if(System.getProperty("debugGPIO") != null) {
 			return String.format(MOCK + DIRECTION_PATH, pinNumber);
 		}
 		
@@ -43,7 +43,7 @@ public class FilePaths {
 	}
 	
 	public static String getValuePath(int pinNumber) {
-		if(System.getProperty("debugGPIO") == null) {
+		if(System.getProperty("debugGPIO") != null) {
 			return String.format(MOCK + VALUE_PATH, pinNumber);
 		}
 		
@@ -51,7 +51,7 @@ public class FilePaths {
 	}
 	
 	public static String getActiveLowPath(int pinNumber) {
-		if(System.getProperty("debugGPIO") == null) {
+		if(System.getProperty("debugGPIO") != null) {
 			return String.format(MOCK + ACTIVELOW_PATH, pinNumber);
 		}
 		
