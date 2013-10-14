@@ -10,7 +10,6 @@ public class OutPin extends GPIO {
 	 * @param args
 	 */
 	int pinMode = -1;
-	GPIO gpioPin = null;
 	
 	public OutPin(String pin) throws InvalidGPIOException, RuntimeException {
 		/* We need to determine if we are digital or analogue, for now, we'll use it for setup and be happy */
@@ -28,10 +27,10 @@ public class OutPin extends GPIO {
 	
 	public void setValue(String target) {
 		try {
-			String currentStatus = gpioPin.readValue();
-			if(currentStatus.equals(target)) {
+			String currentStatus = readValue();
+			if(!currentStatus.equals(target)) {
 				// not the current state
-				gpioPin.writeValue(target);
+				writeValue(target);
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -47,7 +46,7 @@ public class OutPin extends GPIO {
 	
 	public String getValue() {
 		try {
-			return gpioPin.readValue();
+			return readValue();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

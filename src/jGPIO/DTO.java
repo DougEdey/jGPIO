@@ -20,6 +20,27 @@ public class DTO {
 	static int ANALOGUE = 3;
 	
 	static JSONArray pinDefinitions = null;
+	static {
+		try {
+			String definitionFile = System.getProperty("gpio_definition");
+			 JSONParser parser = new JSONParser();
+			 pinDefinitions = (JSONArray) parser.parse(new FileReader(definitionFile));
+			 
+		} catch (NullPointerException NPE) {
+			
+				System.out.println("Could not read the property for gpio_definition, please set this since you are on Linux kernel 3.8 or above");
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("Could not read the GPIO Definitions file");
+			e.printStackTrace();
+		} catch (ParseException e) {
+			
+			e.printStackTrace();
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+	}
 	JSONArray gpios = new JSONArray();
 	
 	/**

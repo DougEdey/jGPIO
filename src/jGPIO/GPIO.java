@@ -27,7 +27,7 @@ public class GPIO {
 	/* These are dupes from DTO */
 	public enum Direction {
 		INPUT("in"),
-		OUTPUT("output"),
+		OUTPUT("out"),
 		PWM("pwm"),
 		ANALOGUE("analogue");
 		
@@ -119,13 +119,22 @@ public class GPIO {
 		// See if we have the JSON for this Pin
 		JSONObject pinJSON = DTO.findDetails(pinName);
 		if(pinJSON != null && pinJSON.containsKey("gpio")) {
-			pinNumber = Integer.parseInt((String) pinJSON.get("gpio"));
+			try {
+				pinNumber = Integer.parseInt((String) pinJSON.get("gpio"));
+			} catch (ClassCastException f) {
+				pinNumber = ((Long)pinJSON.get("gpio")).intValue();
+			}
 		} else {
 			Matcher matcher = pinPatternAlt.matcher(pinName);
 			if(matcher.find()) {
 				pinNumber = Integer.parseInt(matcher.group(2));
 			} else {
-				throw new InvalidGPIOException("Could not match " + pinName + ". As a valid gpio pinout number");
+				matcher = pinPattern.matcher(pinName);
+				if(matcher.find()) {
+					pinNumber = Integer.parseInt(matcher.group(2));
+				} else {
+					throw new InvalidGPIOException("Could not match " + pinName + ". As a valid gpio pinout number");
+				}
 			}
 			
 		}
