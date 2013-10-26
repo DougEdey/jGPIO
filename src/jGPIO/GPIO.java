@@ -1,15 +1,10 @@
 package jGPIO;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +18,7 @@ public class GPIO {
 	static int ANALOGUE = 1;
 	FilePaths gpioFiles = null;
 	int pinNumber = -1;
-	String pinName = null;
+	public String pinName = null;
 	
 	/* These are dupes from DTO */
 	public enum Direction {
