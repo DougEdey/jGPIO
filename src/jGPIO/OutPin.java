@@ -14,7 +14,6 @@ public class OutPin extends GPIO {
 	public OutPin(String pin) throws InvalidGPIOException, RuntimeException {
 		/* We need to determine if we are digital or analogue, for now, we'll use it for setup and be happy */
 		super(pin, GPIO.Direction.OUTPUT);
-		
 	}
 	
 	public void setValue(boolean target) {
@@ -28,7 +27,7 @@ public class OutPin extends GPIO {
 	public void setValue(String target) {
 		try {
 			String currentStatus = readValue();
-			if(!currentStatus.equals(target)) {
+			if (currentStatus != null && !currentStatus.equals(target)) {
 				// not the current state
 				writeValue(target);
 			}

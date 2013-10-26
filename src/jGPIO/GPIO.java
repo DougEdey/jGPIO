@@ -23,6 +23,7 @@ public class GPIO {
 	static int ANALOGUE = 1;
 	FilePaths gpioFiles = null;
 	int pinNumber = -1;
+	String pinName = null;
 	
 	/* These are dupes from DTO */
 	public enum Direction {
@@ -65,8 +66,8 @@ public class GPIO {
 			BufferedReader pinmux = new BufferedReader(new FileReader(pinmuxFile));
 			// get rid of the first two lines
 			String pin = null;
-			while((pin = pinmux.readLine()) != null) {
-				if(pin.contains("(MUX UNCLAIMED) (GPIO UNCLAIMED)")) {
+			while ((pin = pinmux.readLine()) != null) {
+				if (pin.contains("(MUX UNCLAIMED) (GPIO UNCLAIMED)")) {
 					// add this to our list
 					// pin is of form "pin 8 (44e10820): (MUX UNCLAIMED) (GPIO UNCLAIMED)"
 					try {
@@ -105,6 +106,7 @@ public class GPIO {
 	
 	
 	public GPIO(String name, Direction direction) throws InvalidGPIOException, RuntimeException {
+		pinName = name;
 		pinNumber = getPinNumber(name);
 		
 		// we have the pin to set the direction on 
@@ -118,7 +120,7 @@ public class GPIO {
 		int pinNumber = -1;
 		// See if we have the JSON for this Pin
 		JSONObject pinJSON = DTO.findDetails(pinName);
-		if(pinJSON != null && pinJSON.containsKey("gpio")) {
+		if (pinJSON != null && pinJSON.containsKey("gpio")) {
 			try {
 				pinNumber = Integer.parseInt((String) pinJSON.get("gpio"));
 			} catch (ClassCastException f) {
@@ -126,11 +128,11 @@ public class GPIO {
 			}
 		} else {
 			Matcher matcher = pinPatternAlt.matcher(pinName);
-			if(matcher.find()) {
+			if (matcher.find()) {
 				pinNumber = Integer.parseInt(matcher.group(2));
 			} else {
 				matcher = pinPattern.matcher(pinName);
-				if(matcher.find()) {
+				if (matcher.find()) {
 					pinNumber = Integer.parseInt(matcher.group(2));
 				} else {
 					throw new InvalidGPIOException("Could not match " + pinName + ". As a valid gpio pinout number");
@@ -164,12 +166,11 @@ public class GPIO {
 		BufferedReader fis = null;
 		try {
 			fis = new BufferedReader(new FileReader(filename));
-			if(fis.ready()) {
-				
+			if (fis.ready()) {
 				return fis.readLine();
 			}
 		} finally {
-			if(fis != null) {
+			if (fis != null) {
 				fis.close();
 			}
 		}
