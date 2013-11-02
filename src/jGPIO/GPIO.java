@@ -14,11 +14,11 @@ import org.json.simple.JSONObject;
 public class GPIO {
 
 	static String baseOffset = "44e10800";
-	static int DIGITAL = 0;
-	static int ANALOGUE = 1;
+
 	FilePaths gpioFiles = null;
 	int pinNumber = -1;
-	public String pinName = null;
+	String pinName = null;
+	Direction pinDirection = null;
 	
 	/* These are dupes from DTO */
 	public enum Direction {
@@ -104,10 +104,29 @@ public class GPIO {
 		pinName = name;
 		pinNumber = getPinNumber(name);
 		
-		// we have the pin to set the direction on 
-		writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
-		writeFile(FilePaths.getDirectionPath(pinNumber), direction.value);
-		gpioFiles = new FilePaths(pinNumber);
+		// we have the pin to set the direction on for the digital IO or use analogue IO 
+		if (direction == Direction.INPUT || direction == Direction.OUTPUT) {
+			writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
+			writeFile(FilePaths.getDirectionPath(pinNumber), direction.value);
+			gpioFiles = new FilePaths(pinNumber);
+		} else if (direction == Direction.ANALOGUE) {
+			System.out.println("Analogue called with a string constructor, not implemented");
+		} else {
+			System.out.println("Direction " + direction.value + " does not have an implemented int constructor");
+		}
+	}
+	
+	public GPIO(int pinNumber, Direction direction) throws InvalidGPIOException {
+		pinDirection = direction;
+		if (direction == Direction.INPUT || direction == Direction.OUTPUT) {
+			writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
+			writeFile(FilePaths.getDirectionPath(pinNumber), direction.value);
+			gpioFiles = new FilePaths(pinNumber);
+		} else if (direction == Direction.ANALOGUE) {
+			pinName = FilePaths.getAnalogueValuePath(pinNumber);
+		} else {
+			System.out.println("Direction " + direction.value + " does not have an implemented int constructor");
+		}
 	}
 	
 	public static int getPinNumber(String pinName) throws InvalidGPIOException{
@@ -178,11 +197,18 @@ public class GPIO {
 	}
 
 	public String readValue() throws FileNotFoundException, RuntimeException, IOException  {
+		if (pinDirection == Direction.ANALOGUE) {
+			return readFile(pinName);
+		}
 		return readFile(FilePaths.getValuePath(pinNumber));
 	}
 	
 	public void writeValue(String incoming) {
 		writeFile(FilePaths.getValuePath(pinNumber), incoming);
+	}
+	
+	public String getGPIOName() {
+		return pinName;
 	}
 	
 
