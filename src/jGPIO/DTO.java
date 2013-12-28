@@ -27,17 +27,15 @@ public class DTO {
 			 pinDefinitions = (JSONArray) parser.parse(new FileReader(definitionFile));
 			 
 		} catch (NullPointerException NPE) {
-			
-				System.out.println("Could not read the property for gpio_definition, please set this since you are on Linux kernel 3.8 or above");
-			
+			System.out.println("Could not read the property for gpio_definition, please set this since you are on Linux kernel 3.8 or above");
+			System.exit(-1);
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not read the GPIO Definitions file");
 			e.printStackTrace();
+			System.exit(-1);
 		} catch (ParseException e) {
-			
 			e.printStackTrace();
 		} catch (IOException e) {
-			
 			e.printStackTrace();
 		}
 	}
@@ -53,6 +51,7 @@ public class DTO {
 			
 			char[] buffer = new char[100];
 			procVersion.read(buffer);
+			procVersion.close();
 			String fullVersion = new String(buffer);
 			
 		    String re1="(Linux)";	// Word 1
