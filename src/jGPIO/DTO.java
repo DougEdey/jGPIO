@@ -20,25 +20,8 @@ public class DTO {
 	static int ANALOGUE = 3;
 	
 	static JSONArray pinDefinitions = null;
-	static {
-		try {
-			String definitionFile = System.getProperty("gpio_definition");
-			 JSONParser parser = new JSONParser();
-			 pinDefinitions = (JSONArray) parser.parse(new FileReader(definitionFile));
-			 
-		} catch (NullPointerException NPE) {
-			System.out.println("Could not read the property for gpio_definition, please set this since you are on Linux kernel 3.8 or above");
-			System.exit(-1);
-		} catch (FileNotFoundException e) {
-			System.out.println("Could not read the GPIO Definitions file");
-			e.printStackTrace();
-			System.exit(-1);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+	static String definitionFile = null;
+	
 	JSONArray gpios = new JSONArray();
 	
 	/**
@@ -90,27 +73,27 @@ public class DTO {
 		}
 		// load the file containing the GPIO Definitions from the property file
 		try {
-			String definitionFile = System.getProperty("gpio_definition");
-			 JSONParser parser = new JSONParser();
-			 pinDefinitions = (JSONArray) parser.parse(new FileReader(definitionFile));
-			 
+			definitionFile = System.getProperty("gpio_definition");
+			JSONParser parser = new JSONParser();
+			pinDefinitions = (JSONArray) parser.parse(new FileReader(definitionFile));
 		} catch (NullPointerException NPE) {
-			
-				System.out.println("Could not read the property for gpio_definition, please set this since you are on Linux kernel 3.8 or above");
-			
+			System.out.println("Could not read the property for gpio_definition, please set this since you are on Linux kernel 3.8 or above");
+			System.exit(-1);
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not read the GPIO Definitions file");
 			e.printStackTrace();
+			System.exit(-1);
 		} catch (IOException e) {
-			
 			e.printStackTrace();
+			System.exit(-1);
 		} catch (ParseException e) {
-			
 			e.printStackTrace();
+			System.exit(-1);
 		}
 
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean addGPIO(String GPIO, int mode) {
 		JSONObject gpioDetails = findDetails(GPIO);
 		if(gpioDetails == null) {
