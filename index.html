@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Jgpio : Java based GPIO library for Linux Kernel 3.8 and above" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Jgpio</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/DougEdey/jGPIO">View on GitHub</a>
+
+          <h1 id="project_title">Jgpio</h1>
+          <h2 id="project_tagline">Java based GPIO library for Linux Kernel 3.8 and above</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/DougEdey/jGPIO/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/DougEdey/jGPIO/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="jgpio---java-gpio-library-for-linux-kernel-38" class="anchor" href="#jgpio---java-gpio-library-for-linux-kernel-38"><span class="octicon octicon-link"></span></a>jGPIO - Java GPIO Library for Linux Kernel 3.8</h1>
+
+<p>This is an entry level GPIO library for Java. I'll be adding onto it rapidly as I get more going, but for now I'm looking for people to test the Device Tree Overlay generator</p>
+
+<p>The Device Tree Overlay is a new introduction in Linux Kernel 3.8 to enforce easier kernel devlopment.</p>
+
+<p>One Parameter is required: -Dgpio_definition=, this needs topoint at a definition JSON file, see bone.js for an example</p>
+
+<p>Use jGPIO.DTOTest by itself to list the Free GPIO pins</p>
+
+<p>java -cp libs/json-simple-1.1.1.jar:. -Dgpio_definition=jGPIO/bone.js jGPIO.DTOTest</p>
+
+<p>Then you can supply a direct GPIO pin (GPIO2_7 for instance) or a Pin Header P9_41 to generate a DTO file if the pin is free. If the pin isn't free it'll tell you</p>
+
+<p>You can supply multiple pins and it will use whichever pins are available to generate the DTO file.</p>
+
+<p>I'm working on the DTO Compilation, firmware installation, loading through the capemgr, and exporting for access via applications.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Jgpio maintained by <a href="https://github.com/DougEdey">DougEdey</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
