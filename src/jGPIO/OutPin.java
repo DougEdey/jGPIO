@@ -32,8 +32,8 @@ public class OutPin extends GPIO {
 				writeValue(target);
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// Doesn't exist may have closed already
+			System.out.println("GPIO Doesn't exist, may have already closed");
 		} catch (RuntimeException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
