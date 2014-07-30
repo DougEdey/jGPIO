@@ -41,11 +41,11 @@ public class GPIO {
 	}
 	
 	/* Regex Pattern matching */
-	public static Pattern pinPattern = Pattern.compile("(gpio)([0-9])_([0-9]*)$", Pattern.CASE_INSENSITIVE);
-	public static Pattern pinPatternAlt = Pattern.compile("(gpio)(_)?([\\d]*)$",Pattern.CASE_INSENSITIVE);
+	public static Pattern pinPattern = Pattern.compile("(gpio)([0-9])_([0-9]+)$", Pattern.CASE_INSENSITIVE);
+	public static Pattern pinPatternAlt = Pattern.compile("(gpio)(_)?([\\d]+)$",Pattern.CASE_INSENSITIVE);
 	
 	/* Beaglebone Regex */
-	public static Pattern pinPatternBeagle = Pattern.compile("(p)([0-9])_([0-9]*)", Pattern.CASE_INSENSITIVE);
+	public static Pattern pinPatternBeagle = Pattern.compile("(p)([0-9])_([0-9]+)", Pattern.CASE_INSENSITIVE);
 	
 	boolean closing = false;
 	/**
@@ -143,7 +143,7 @@ public class GPIO {
 		} else {
 			Matcher matcher = pinPatternAlt.matcher(pinName);
 			if (matcher.find()) {
-				pinNumber = Integer.parseInt(matcher.group(matcher.end()-1));
+				pinNumber = Integer.parseInt(matcher.group(matcher.groupCount()));
 			} else {
 				matcher = pinPattern.matcher(pinName);
 				if (matcher.find()) {
