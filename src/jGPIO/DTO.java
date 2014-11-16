@@ -1,15 +1,30 @@
 package jGPIO;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class DTO {
 
@@ -18,6 +33,7 @@ public class DTO {
 	static int OUTPUT = 1;
 	static int PWM = 2;
 	static int ANALOGUE = 3;
+	static String DEFAULT_DEFINITIONS = "extras/gpio_definitions_lookup.xml";;
 	
 	static JSONArray pinDefinitions = null;
 	static String definitionFile = null;
@@ -74,7 +90,16 @@ public class DTO {
 		// load the file containing the GPIO Definitions from the property file
 		try {
 			definitionFile = System.getProperty("gpio_definition");
+			// No definition file, try an alternative name
+			if (definitionFile == null) {
+			    System.getProperty("gpio_definitions");
+			}
+			if (definitionFile == null) {
+			    // Still no definition file, try to autodetect it.
+			    definitionFile = autoDetectSystemFile();
+			}
 			JSONParser parser = new JSONParser();
+			System.out.println("Using GPIO Definitions file: " + definitionFile);
 			pinDefinitions = (JSONArray) parser.parse(new FileReader(definitionFile));
 		} catch (NullPointerException NPE) {
 			System.out.println("Could not read the property for gpio_definition, please set this since you are on Linux kernel 3.8 or above");
@@ -93,7 +118,101 @@ public class DTO {
 
 	}
 	
-	@SuppressWarnings("unchecked")
+	/**
+	 * Tries to use lshw to detect the physical system in use.
+	 * @return The filename of the GPIO Definitions file.
+	 */
+	static private String autoDetectSystemFile() {
+	    String definitions = System.getProperty("definitions.lookup");
+	    if (definitions == null) {
+	        definitions = DEFAULT_DEFINITIONS;
+	    }
+	    
+        File capabilitiesFile = new File(definitions);
+        
+        // If it doesn't exist, fall back to the default
+        if (!capabilitiesFile.exists() 
+                && !definitions.equals(DEFAULT_DEFINITIONS)) {
+            System.out.println(
+                "Could not find definitions lookup file at: " + definitions);
+            System.out.println("Trying default definitions file at: " + definitions);
+            capabilitiesFile = new File(DEFAULT_DEFINITIONS);
+        }
+        
+        if (!capabilitiesFile.exists()) {
+            System.out.println("Could not find definitions file at: " + definitions);
+            return null;
+        }
+        
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = null;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e1) {
+            e1.printStackTrace();
+        }
+        
+        // Generate the lshw output if available
+        Process lshw;
+        try {
+            lshw = Runtime.getRuntime().exec("lshw -c bus -xml");
+            lshw.waitFor();
+        } catch (Exception e1) {
+            System.out.println("Couldn't execute lshw to identify board");
+            e1.printStackTrace();
+            return null;
+        }
+        Document lshwXML = null;
+        try {
+            lshwXML = dBuilder.parse(lshw.getInputStream());
+        } catch (IOException e1) {
+            System.out.println("IO Exception running lshw");
+            e1.printStackTrace();
+            return null;
+        } catch (SAXException e1) {
+            System.out.println("Could not parse lshw output");
+            e1.printStackTrace();
+            return null;
+        }
+        
+        XPath xp = XPathFactory.newInstance().newXPath();
+        NodeList capabilities;
+        try {
+            capabilities = (NodeList) xp.evaluate(
+                        "/list/node[@id=\"core\"]/capabilities/capability",
+                        lshwXML, XPathConstants.NODESET);
+        } catch (XPathExpressionException e1) {
+            System.out.println("Couldn't run Caoability lookup");
+            e1.printStackTrace();
+            return null;
+        }
+                    
+        Document lookupDocument = null;
+        try {
+            lookupDocument = dBuilder.parse(capabilitiesFile);
+            String lookupID = null;
+            
+            for (int i = 0; i < capabilities.getLength(); i++) {
+                Node c = capabilities.item(i);
+                lookupID = c.getAttributes().getNamedItem("id").getNodeValue(); 
+                System.out.println("Looking for: " + lookupID);
+                NodeList nl = (NodeList) xp.evaluate(
+                        "/lookup/capability[@id=\"" + lookupID + "\"]", lookupDocument,
+                        XPathConstants.NODESET);
+    
+                if (nl.getLength() == 1) {
+                    definitionFile = nl.item(0).getAttributes().getNamedItem("file").getNodeValue();
+                    pinDefinitions = (JSONArray)new JSONParser().parse(new FileReader(definitionFile));
+                    return definitionFile;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
 	public boolean addGPIO(String GPIO, int mode) {
 		JSONObject gpioDetails = findDetails(GPIO);
 		if(gpioDetails == null) {
@@ -204,6 +323,9 @@ public class DTO {
 	
 	public static JSONObject findDetails(String gpio_name) {
 		// Do we have a valid definition file, or should we just direct map?
+		if (pinDefinitions == null) {
+		    autoDetectSystemFile();
+		}
 		if (pinDefinitions == null) {
 			System.out.println("No definitions file found, assuming direct mapping");
 			return null; 
