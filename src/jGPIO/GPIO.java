@@ -1,6 +1,7 @@
 package jGPIO;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -85,7 +86,6 @@ public class GPIO {
 					}
 				}
 			}
-			
 			return freeList;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -96,7 +96,6 @@ public class GPIO {
 		} 
 		
 		return null;
-		
 	}
 	
 	
@@ -106,9 +105,12 @@ public class GPIO {
 		
 		// we have the pin to set the direction on for the digital IO or use analogue IO 
 		if (direction == Direction.INPUT || direction == Direction.OUTPUT) {
-			writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
+		    gpioFiles = new FilePaths(pinNumber);
+		    // Check to see if it doesn't exist before tryping to export it.
+		    if (!new File(FilePaths.getValuePath(pinNumber)).exists()) {
+		        writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
+		    }
 			writeFile(FilePaths.getDirectionPath(pinNumber), direction.value);
-			gpioFiles = new FilePaths(pinNumber);
 		} else if (direction == Direction.ANALOGUE) {
 			System.out.println("Analogue called with a string constructor, not implemented");
 		} else {
@@ -118,10 +120,12 @@ public class GPIO {
 	
 	public GPIO(int pinNumber, Direction direction) throws InvalidGPIOException {
 		pinDirection = direction;
+		gpioFiles = new FilePaths(pinNumber);
 		if (direction == Direction.INPUT || direction == Direction.OUTPUT) {
-			writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
+		    if (!new File(FilePaths.getValuePath(pinNumber)).exists()) {
+                writeFile(FilePaths.getExportPath(), String.valueOf(pinNumber));
+            }
 			writeFile(FilePaths.getDirectionPath(pinNumber), direction.value);
-			gpioFiles = new FilePaths(pinNumber);
 		} else if (direction == Direction.ANALOGUE) {
 			pinName = FilePaths.getAnalogueValuePath(pinNumber);
 		} else {
