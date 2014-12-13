@@ -166,15 +166,13 @@ public class GPIO {
 			FileOutputStream fos = new FileOutputStream(fileName);
 			fos.write(value.getBytes());
 			fos.close();
+		} catch (FileNotFoundException fnfe) {
+		    throw new RuntimeException("Permission denied to GPIO file: " + fnfe.getMessage());
+		} catch (SecurityException e) {
+		    throw new RuntimeException("Permission denied to GPIO file: " + e.getMessage());
 		} catch (IOException e) {
-			if(e.getMessage().contains("Permission denied")) {
-				throw new RuntimeException("Permission denied to GPIO file: " + e.getMessage());
-			} else if (e.getMessage().contains("busy")) {
-				System.out.println("GPIO is already exported, continuing");
-				return;
-			}
-			throw new RuntimeException("Could not write to GPIO file: " + e.getMessage());
-		}
+            System.out.println("GPIO is already exported, continuing");
+        }
 	}
 	
 	protected String readFile(String filename) throws FileNotFoundException, RuntimeException, IOException {
