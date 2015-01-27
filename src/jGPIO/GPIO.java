@@ -36,9 +36,7 @@ public class GPIO {
 
 		public String getValue() {
 			return value;
-		}
-		
-		
+		}	
 	}
 	
 	/* Regex Pattern matching */
@@ -208,6 +206,19 @@ public class GPIO {
 	
 	public void writeValue(String incoming) {
 		writeFile(FilePaths.getValuePath(pinNumber), incoming);
+		try {
+		    String readVal = readValue();
+            if (!readVal.equals(incoming)) {
+                throw new RuntimeException("Tried to change pin " + pinNumber + 
+                        " but failed to write: " + incoming + ", got " + readVal);
+            }
+		} catch (FileNotFoundException fnfe) {
+            throw new RuntimeException("Permission denied to GPIO file: " + fnfe.getMessage());
+        } catch (SecurityException e) {
+            throw new RuntimeException("Permission denied to GPIO file: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException("IO Exception to GPIO file: " + e.getMessage());
+        }
 	}
 	
 	public String getGPIOName() {
