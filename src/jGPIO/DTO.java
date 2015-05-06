@@ -168,7 +168,7 @@ public class DTO {
             lshw.waitFor();
         } catch (Exception e1) {
             System.out.println("Couldn't execute lshw to identify board");
-            e1.printStackTrace();
+            System.out.println(e1.getMessage());
             return null;
         }
         Document lshwXML = null;
