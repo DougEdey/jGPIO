@@ -3,3 +3,7 @@
 #Hide the maven build folder
 target
 bin
+
+.idea
+build
+.gradle
